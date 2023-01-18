@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "tcm src/ --camelCase --watch",
-    "build": "tsc && tcm src/ --camelCase && vite build"
+    "dev": "tcm --pattern 'src/**/*.module.css' --camelCase --watch",
+    "build": "tsc && tcm --pattern 'src/**/*.module.css' --camelCase && vite build"
   },
   "files": [
     "dist"
