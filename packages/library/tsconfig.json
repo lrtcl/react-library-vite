@@ -40,10 +40,5 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ],
-  "paths": {
-    "@assets/*": [
-      "assets/*"
-    ]
-  }
+  ]
 }
