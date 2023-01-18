@@ -26,9 +26,9 @@ export default defineConfig({
     postcss: {
       map: true,
       plugins: [
-        autoprefixer()
-      ]
-    }
+        autoprefixer(),
+      ],
+    },
   },
   build: {
     cssCodeSplit: true,

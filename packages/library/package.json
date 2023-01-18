@@ -4,9 +4,8 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "tcm src/ --camelCase --watch & vite --open",
-    "build": "tsc && tcm src/ --camelCase && vite build",
-    "preview": "vite preview"
+    "dev": "tcm src/ --camelCase --watch",
+    "build": "tsc && tcm src/ --camelCase && vite build"
   },
   "files": [
     "dist"

@@ -1,2 +1,5 @@
-export type { IHelloWorld } from './Helloworld/Helloworld'
-export { Helloworld } from './Helloworld/Helloworld'
+import '@assets/bases.css';
+
+export { Helloworld } from './Helloworld/Helloworld';
+export type { IHelloWorld } from './Helloworld/Helloworld';
+
