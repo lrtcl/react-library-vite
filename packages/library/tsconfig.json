@@ -25,6 +25,9 @@
     "paths": {
       "react-library-vite": [
         "src/component/index.ts"
+      ],
+      "@*": [
+        "./src/*"
       ]
     },
     "typeRoots": [
