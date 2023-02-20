@@ -3,7 +3,7 @@ import { ChangeEventHandler } from "react";
 export interface GenericInputProps extends React.ComponentPropsWithRef<"input"> {
   /**
    * A custom `id` for the `<input />`.
-   * By default, a unique id is generated using uuidv4.
+   * By default, a unique id is generated using react's useId().
    */
   id?: string,
   /**
@@ -28,11 +28,11 @@ export interface GenericInputProps extends React.ComponentPropsWithRef<"input"> 
   required?: boolean,
   /**
    * Optional text or symbol that will indicate the required status.<br />
-   * WARNING: If you use the `*` symbol to indicate that a field is required, you have to explain it to the user **before** the form.
+   * WARNING: If you use the `*` symbol to indicate that a field is required, you have to explain its meaning to the user **before** the form.
    */
   requiredText?: string,
   /**
-   * If `true`, the input will be marked as invalid and will show an error.
+   * If `true`, the input will be marked as invalid and will show the `errorMessage`.
    */
   invalid?: boolean,
   /**
@@ -46,5 +46,5 @@ export interface GenericInputProps extends React.ComponentPropsWithRef<"input"> 
   /**
    * The value of the `<input />`.
    */
-  value?: string | number | readonly string[],
+  value?: string,
 }

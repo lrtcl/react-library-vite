@@ -1,36 +1,87 @@
 import { TextInput } from '@components';
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
 
-const meta: Meta<typeof TextInput> = {
+const meta = {
   title: 'Text input',
   component: TextInput,
-  tags: ['autodocs']
-};
+  tags: ['autodocs'],
+  argTypes: {
+    label: {
+      table: {
+        category: 'text'
+      }
+    },
+    requiredText: {
+      table: {
+        category: 'text'
+      }
+    },
+    helperText: {
+      table: {
+        category: 'text'
+      }
+    },
+    errorMessage: {
+      table: {
+        category: 'text'
+      }
+    },
+    counterText: {
+      table: {
+        category: 'text'
+      }
+    },
+    showCounter: {
+      table: {
+        category: 'text'
+      }
+    },
+    counterVariant: {
+      table: {
+        category: 'text'
+      }
+    },
+    hideLabel: {
+      table: {
+        category: 'text'
+      }
+    },
+    required: {
+      table: {
+        category: 'validation'
+      }
+    },
+    maxLength: {
+      table: {
+        category: 'validation'
+      }
+    },
+    invalid: {
+      table: {
+        category: 'validation'
+      }
+    },
+    onChange: {
+      control: 'null',
+      table: {
+        category: 'events'
+      }
+    }
+  }
+} satisfies Meta<typeof TextInput>;
 
 export default meta;
-type Story = StoryObj<typeof TextInput>;
+type Story = StoryObj<typeof meta>;
+
+
+
+const testChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  console.log("testChange");
+}
 
 export const Default: Story = {
   args: {
     label: "Label",
-  }
-};
-
-export const Controlled: Story = {
-  args: {
-    label: "Label",
-  },
-  render: (args) => {
-    const [value, setValue] = useState(args.value ?? '');
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setValue(event.target.value);
-    }
-    return (
-      <>
-        <TextInput {...args} value={value} onChange={handleChange} />
-        <p>value is: {value}</p>
-      </>
-    );
+    // onChange: testChange
   }
 };

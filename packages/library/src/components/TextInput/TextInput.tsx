@@ -1,9 +1,9 @@
-import React, { useId } from "react";
+import React, { useId, useState } from "react";
 import { GenericInputProps } from "../GenericInputProps";
 
 export interface TextInputProps extends GenericInputProps {
   /**
-   * The type of the `<input />`.
+   * The type of `<input />`.
    */
   type?: "text" | "email" | "password" | "tel" | "url" | "search",
   /**
@@ -33,6 +33,69 @@ export interface TextInputProps extends GenericInputProps {
   counterVariant?: "current" | "remaining",
 }
 
+interface GenerateUniqueId {
+  (id?: string): string;
+}
+// Generate a generic id if none has been explicitely set, by using react's useId
+const generateUniqueId: GenerateUniqueId = (id) => {
+  if (id === undefined) {
+    id = `${useId()}input`;
+  }
+  return id;
+}
+
+interface GenerateAriaDescribedBy {
+  (
+    id: string,
+    helperText: TextInputProps["helperText"],
+    errorMessage: TextInputProps["errorMessage"],
+    invalid: TextInputProps["invalid"],
+    maxLength: TextInputProps["maxLength"],
+    showCounter: TextInputProps["showCounter"]
+  ): string | undefined
+}
+// Generate the ids string for aria-describedby, based on the component props
+const generateAriaDescribedBy: GenerateAriaDescribedBy = (id, helperText, errorMessage, invalid, maxLength, showCounter) => {
+  let ariaDescribedByIds: string[] = [];
+  let ariaDescribedBy: string | undefined;
+
+  if (invalid && Boolean(errorMessage)) {
+    ariaDescribedByIds.push(`${id}-error`);
+  }
+  if (!invalid && Boolean(helperText)) {
+    ariaDescribedByIds.push(`${id}-helper`);
+  }
+  if (maxLength && Boolean(showCounter)) {
+    ariaDescribedByIds.push(`${id}-counter`);
+  }
+  if (ariaDescribedByIds.length > 0) {
+    ariaDescribedBy = ariaDescribedByIds.join(" ");
+  }
+  return ariaDescribedBy;
+}
+interface GenerateCounterText {
+  (
+    counterVariant: TextInputProps["counterVariant"],
+    maxLength: TextInputProps["maxLength"],
+    counterText: TextInputProps["counterText"],
+    value: TextInputProps["value"]
+  ): string
+}
+// Calculate the value displayed in the counter
+const generateCounter: GenerateCounterText = (counterVariant, maxLength, counterText, value) => {
+  let counterValue: number = 0;
+
+  if (maxLength !== undefined && value !== undefined) {
+    if (counterVariant === "current") {
+      counterValue = value.toString().length;
+    } else if (counterVariant === "remaining") {
+      counterValue = maxLength - value.toString().length;
+    }
+  }
+  return `${counterValue} / ${maxLength} ${counterText}`;
+}
+
+// TextInput component
 export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
   id,
   name,
@@ -46,47 +109,21 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
   counterVariant = "current",
   showCounter,
   errorMessage,
-  required,
+  required = false,
   requiredText = "*",
-  invalid,
+  invalid = false,
   autoComplete,
+  value,
+  onChange = undefined,
   ...rest
 }: TextInputProps, ref) => {
-  // We make sure the default `id` is unique by using uuidv4
-  if (!Boolean(id)) {
-    id = `${useId()}input`;
-  }
+  const uniqueId: string = generateUniqueId(id);
+  const [inputValue, setInputValue] = useState(value ?? '');
 
-  // Generate the ids string for aria-describedby, based on the component props
-  const generateAriaDescribedBy = () => {
-    let ariaDescribedByIds: string[] = [];
-    let ariaDescribedBy: string | undefined;
-    if (invalid && Boolean(errorMessage)) {
-      ariaDescribedByIds.push(`${id}-error`);
-    }
-    if (!invalid && Boolean(helperText)) {
-      ariaDescribedByIds.push(`${id}-helper`);
-    }
-    if (maxLength && Boolean(showCounter)) {
-      ariaDescribedByIds.push(`${id}-counter`);
-    }
-    if (ariaDescribedByIds.length > 0) {
-      ariaDescribedBy = ariaDescribedByIds.join(" ");
-    }
-    return ariaDescribedBy;
-  }
-
-  // Calculate the value displayed in the counter
-  const generateCounterValue = () => {
-    let counterValue = 0;
-    if (maxLength !== undefined && rest.value !== undefined) {
-      if (counterVariant === "current") {
-        counterValue = rest.value.toString().length;
-      } else if (counterVariant === "remaining") {
-        counterValue = maxLength - rest.value.toString().length;
-      }
-    }
-    return counterValue;
+  // onChange event handler
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("handleChange");
+    setInputValue(event.target.value);
   }
 
   return (
@@ -100,40 +137,42 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
 
       {/* Input */}
       <input
-        id={id}
-        name={name}
+        onChange={onChange !== undefined ? onChange : handleChange}
+        {...rest}
         className="mylib--textinput__input"
+        id={uniqueId}
+        name={name}
         type={type}
         inputMode={inputMode}
         title={hideLabel ? label : undefined}
-        aria-describedby={generateAriaDescribedBy()}
+        aria-describedby={generateAriaDescribedBy(uniqueId, helperText, errorMessage, invalid, maxLength, showCounter)}
         maxLength={maxLength}
         required={required}
-        aria-required={required}
-        aria-invalid={invalid}
+        aria-required={required || undefined}
+        aria-invalid={invalid || undefined}
         autoComplete={autoComplete}
+        value={inputValue}
         ref={ref}
-        {...rest}
       />
 
       {/* Helper text */}
       {Boolean(helperText) && !invalid && (
-        <div id={`${id}-helper`} className="mylib--textinput__message mylib--textinput__helper">
+        <div id={`${uniqueId}-helper`} className="mylib--textinput__message mylib--textinput__helper">
           {helperText}
         </div>
       )}
 
       {/* Error text */}
       {Boolean(errorMessage) && invalid && (
-        <div id={`${id}-error`} className="mylib--textinput__message mylib--textinput__error-message">
+        <div id={`${uniqueId}-error`} className="mylib--textinput__message mylib--textinput__error-message">
           {errorMessage}
         </div>
       )}
 
       {/* Character counter */}
       {Boolean(maxLength) && showCounter && (
-        <div id={`${id}-counter`} className="mylib--textinput__counter">
-          {`${generateCounterValue()} / ${maxLength} ${counterText}`}
+        <div id={`${uniqueId}-counter`} className="mylib--textinput__counter">
+          {generateCounter(counterVariant, maxLength, counterText, inputValue)}
         </div>
       )}
     </div>
