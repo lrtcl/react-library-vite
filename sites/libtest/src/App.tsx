@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Helloworld, TextInput } from 'react-library-vite';
+import { TextInput } from 'react-library-vite';
 import '../../../node_modules/react-library-vite/dist/index.css';
 import './App.css';
 
@@ -12,10 +12,6 @@ function App() {
 
   return (
     <div>
-      <Helloworld text="Yo Bitches!!!" color="accent" variant="strong" />
-
-      <TextInput label="Uncontrolled input" />
-
       <TextInput label="Controlled input" value={value} onChange={handleChange} />
       <p>The value of the controlled input is: {value}</p>
     </div>
