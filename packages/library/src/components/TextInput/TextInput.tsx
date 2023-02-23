@@ -1,5 +1,6 @@
 import React, { useId, useState } from "react";
 import { GenericInputProps } from "../GenericInputProps";
+import styles from './TextInput.module.css';
 
 export interface TextInputProps extends GenericInputProps {
   /**
@@ -156,7 +157,7 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
     <div className="mylib--form-item mylib--textinput">
       {/* Input label */}
       {!hideLabel && (
-        <label className="mylib--textinput__label" htmlFor={id}>
+        <label className={`mylib--textinput__label ${styles.label}`} htmlFor={id}>
           {label}{required && <span className="mylib--textinput__required-text">{Boolean(requiredText) ? requiredText : "*"}</span>}
         </label>
       )}
