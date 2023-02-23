@@ -12,7 +12,11 @@ function App() {
 
   return (
     <div>
-      <TextInput label="Controlled input" value={value} onChange={handleChange} />
+      <TextInput label="Internally controlled input" showCounter maxLength={64} counterText="caractères" />
+
+      <TextInput label="Internally controlled input with default value" defaultValue="test" showCounter maxLength={64} counterText="caractères" />
+
+      <TextInput label="Controlled input" value={value} onChange={handleChange} showCounter maxLength={64} counterText="caractères" />
       <p>The value of the controlled input is: {value}</p>
     </div>
   )

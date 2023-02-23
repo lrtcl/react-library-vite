@@ -73,15 +73,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-
-
-const testChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  console.log("testChange");
-}
-
 export const Default: Story = {
   args: {
+    label: "Label"
+  }
+};
+
+export const WithCounter: Story = {
+  args: {
     label: "Label",
-    // onChange: testChange
+    maxLength: 20,
+    showCounter: true
+  },
+  parameters: {
+    title: "rf",
   }
 };

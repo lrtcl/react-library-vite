@@ -113,18 +113,44 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
   requiredText = "*",
   invalid = false,
   autoComplete,
-  value,
-  onChange = undefined,
+  value: valueFromProps,
+  onChange: onChangeFromProps,
+  defaultValue,
   ...rest
 }: TextInputProps, ref) => {
   const uniqueId: string = generateUniqueId(id);
-  const [inputValue, setInputValue] = useState(value ?? '');
 
-  // onChange event handler
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("handleChange");
-    setInputValue(event.target.value);
-  }
+  // A component can be considered controlled when its value prop is
+  // not undefined.
+  const isControlled = typeof valueFromProps != "undefined";
+  // When a component is not controlled, it can have a defaultValue.
+  const hasDefaultValue = typeof defaultValue != "undefined";
+
+  // If a defaultValue is specified, we will use it as our initial
+  // state.  Otherwise, we will simply use an empty string.
+  const [internalValue, setInternalValue] = useState(
+    hasDefaultValue ? defaultValue : ""
+  );
+
+  // Internally, we need to deal with some value. Depending on whether
+  // the component is controlled or not, that value comes from its
+  // props or from its internal state.
+  const value = isControlled ? valueFromProps : internalValue;
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // When the user types, we will call props.onChange if it exists.
+    // We do this even if there is no props.value (and the component
+    // is uncontrolled.)
+    if (onChangeFromProps) {
+      onChangeFromProps(event);
+    }
+
+    // If the component is uncontrolled, we need to update our
+    // internal value here.
+    if (!isControlled) {
+      setInternalValue(event.target.value);
+    }
+  };
 
   return (
     <div className="mylib--form-item mylib--textinput">
@@ -137,13 +163,15 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
 
       {/* Input */}
       <input
-        onChange={onChange !== undefined ? onChange : handleChange}
+        value={value}
+        onChange={onChange}
         {...rest}
         className="mylib--textinput__input"
         id={uniqueId}
         name={name}
         type={type}
         inputMode={inputMode}
+        aria-label={hideLabel ? label : undefined}
         title={hideLabel ? label : undefined}
         aria-describedby={generateAriaDescribedBy(uniqueId, helperText, errorMessage, invalid, maxLength, showCounter)}
         maxLength={maxLength}
@@ -151,7 +179,6 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
         aria-required={required || undefined}
         aria-invalid={invalid || undefined}
         autoComplete={autoComplete}
-        value={inputValue}
         ref={ref}
       />
 
@@ -172,7 +199,7 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
       {/* Character counter */}
       {Boolean(maxLength) && showCounter && (
         <div id={`${uniqueId}-counter`} className="mylib--textinput__counter">
-          {generateCounter(counterVariant, maxLength, counterText, inputValue)}
+          {generateCounter(counterVariant, maxLength, counterText, value)}
         </div>
       )}
     </div>

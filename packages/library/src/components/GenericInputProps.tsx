@@ -44,7 +44,12 @@ export interface GenericInputProps extends React.ComponentPropsWithRef<"input"> 
    */
   onChange?: ChangeEventHandler<HTMLInputElement>,
   /**
-   * The value of the `<input />`.
+   * The value of the `<input />`. Passing this prop will mark the input as controlled.
    */
   value?: string,
+  /**
+   * Pass a default value to the component, without marking the input as controlled.
+   * This prop will have no effect if `value` is passed to the component.
+   */
+  defaultValue?: string
 }
