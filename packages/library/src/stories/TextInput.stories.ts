@@ -1,9 +1,15 @@
 import { TextInput } from '@components';
 import type { Meta, StoryObj } from '@storybook/react';
 
+/**
+ * Meta description
+ */
 const meta = {
   title: 'Text input',
   component: TextInput,
+  parameters: {
+    componentSubtitle: 'Subtitle'
+  },
   tags: ['autodocs'],
   argTypes: {
     label: {
@@ -75,14 +81,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: "Label"
+    label: 'Label'
   }
 };
 
+/**
+ * The Character counter requires at least both `maxLength` and `showCounter` props to work.<br />
+ * In addition, other props can adjust the counter behavior to your needs:
+ * - `counterText`: optional custom text at the end of the counter
+ * - `counterVariant`: display value length (default) or remaining characters.
+ */
 export const WithCounter: Story = {
   args: {
     ...Default.args,
     maxLength: 20,
     showCounter: true
-  }
+  },
+  // name: 'With Counter',
 };

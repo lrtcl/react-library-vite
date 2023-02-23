@@ -18,6 +18,7 @@ export interface TextInputProps extends GenericInputProps {
   hideLabel?: boolean,
   /**
    * The maximum length of the value.
+   * This prop is required for the character counter.
    */
   maxLength?: number,
   /**

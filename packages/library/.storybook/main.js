@@ -20,6 +20,7 @@ export default {
     check: false,
   },
   docs: {
-    autodocs: "tag"
+    autodocs: "tag",
+    defaultName: "Documentation"
   },
 };
