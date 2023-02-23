@@ -1,4 +1,12 @@
-import {Title, Subtitle, Description, Primary, Controls, Stories} from '@storybook/blocks';
+import {Meta, Title, Subtitle, Description, Primary, Controls, Stories} from '@storybook/blocks';
+
+{/*
+  * 👇 The isTemplate property is required to tell Storybook that this is a template
+  * See https://storybook.js.org/docs/7.0/react/api/doc-block-meta
+  * to learn how to use
+*/}
+
+<Meta isTemplate />
 
 <Title />
 
@@ -6,11 +14,11 @@ import {Title, Subtitle, Description, Primary, Controls, Stories} from '@storybo
 
 <Description />
 
-## Starter example
+## Default implementation
 
 <Primary />
 
-## Component inputs
+## Inputs
 
 The component accepts the following inputs (props):
 
@@ -18,8 +26,8 @@ The component accepts the following inputs (props):
 
 ---
 
-## Additional examples
+## Additional variations
 
-Listed below are some additional examples of how to use the component.
+Listed below are some additional variations of the component.
 
 <Stories />

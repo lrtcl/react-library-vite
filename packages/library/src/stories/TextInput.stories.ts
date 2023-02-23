@@ -81,11 +81,8 @@ export const Default: Story = {
 
 export const WithCounter: Story = {
   args: {
-    label: "Label",
+    ...Default.args,
     maxLength: 20,
     showCounter: true
-  },
-  parameters: {
-    title: "rf",
   }
 };
