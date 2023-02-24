@@ -51,5 +51,6 @@ export interface GenericInputProps extends React.ComponentPropsWithRef<"input"> 
    * Pass a default value to the component, without marking the input as controlled.
    * This prop will have no effect if `value` is passed to the component.
    */
-  defaultValue?: string
+  defaultValue?: string,
+  className?: string
 }

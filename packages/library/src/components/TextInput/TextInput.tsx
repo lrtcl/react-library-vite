@@ -1,3 +1,4 @@
+import classnames from "classnames";
 import React, { useId, useState } from "react";
 import { GenericInputProps } from "../GenericInputProps";
 import styles from './TextInput.module.css';
@@ -118,6 +119,7 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
   value: valueFromProps,
   onChange: onChangeFromProps,
   defaultValue,
+  className,
   ...rest
 }: TextInputProps, ref) => {
   const uniqueId: string = generateUniqueId(id);
@@ -154,11 +156,13 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
     }
   };
 
+  const classNames = classnames("mylib--form-item mylib--textinput", className)
+
   return (
-    <div className="mylib--form-item mylib--textinput">
+    <div className={classNames}>
       {/* Input label */}
       {!hideLabel && (
-        <label className={`mylib--textinput__label ${styles.label}`} htmlFor={id}>
+        <label className={`mylib--textinput__label ${styles.label}`} htmlFor={uniqueId}>
           {label}{required && <span className="mylib--textinput__required-text">{Boolean(requiredText) ? requiredText : "*"}</span>}
         </label>
       )}

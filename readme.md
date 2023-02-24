@@ -8,9 +8,9 @@
 6. configure css modules for typescript
 7. Create first component and test it
 8. Configure vite autoprefixing
+9. add storybook
 
 ## TODO:
 * add postcss plugins
 * add eslint, stylelint, prettier
-* add storybook
 * start coding!!!
