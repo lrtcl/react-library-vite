@@ -14,10 +14,13 @@ export default {
     options: {},
   },
   typescript: {
-    // Overrides the default Typescript configuration to allow multi-package components to be documented via AutoDocs.
-    reactDocgen: 'react-docgen',
-    skipBabel: true,
     check: false,
+    checkOptions: {},
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      shouldExtractLiteralValuesFromEnum: true,
+      propFilter: (prop) => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
+    },
   },
   docs: {
     autodocs: "tag",
