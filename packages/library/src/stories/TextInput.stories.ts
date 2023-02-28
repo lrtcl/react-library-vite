@@ -32,32 +32,12 @@ const meta = {
         category: 'text'
       }
     },
-    counterText: {
-      table: {
-        category: 'text'
-      }
-    },
-    showCounter: {
-      table: {
-        category: 'text'
-      }
-    },
-    counterVariant: {
-      table: {
-        category: 'text'
-      }
-    },
     hideLabel: {
       table: {
         category: 'text'
       }
     },
     required: {
-      table: {
-        category: 'validation'
-      }
-    },
-    maxLength: {
       table: {
         category: 'validation'
       }
@@ -71,6 +51,31 @@ const meta = {
       control: 'null',
       table: {
         category: 'events'
+      }
+    },
+    showCounter: {
+      table: {
+        category: 'character counter'
+      }
+    },
+    counterLimit: {
+      table: {
+        category: 'character counter'
+      }
+    },
+    counterHelperText: {
+      table: {
+        category: 'character counter'
+      }
+    },
+    counterTextUnderLimit: {
+      table: {
+        category: 'character counter'
+      }
+    },
+    counterTextOverLimit: {
+      table: {
+        category: 'character counter'
       }
     }
   }
@@ -86,16 +91,24 @@ export const Default: Story = {
 };
 
 /**
- * The Character counter requires at least both `maxLength` and `showCounter` props to work.<br />
- * In addition, other props can adjust the counter behavior to your needs:
- * - `counterText`: optional custom text at the end of the counter
- * - `counterVariant`: display value length (default) or remaining characters.
+ * The Character counter requires at least the following props to be set:
+ * - `showCounter`
+ * - `counterLimit`
+ * - `counterHelperText` (not displayed on screen, but required for screen reader users)
+ *
+ * Additionally, these props have default values, so they are optional. Use them to customize or translate the text displayed on the counter:
+ * - `counterTextUnderLimit`
+ * - `counterTextOverLimit`
  */
 export const WithCounter: Story = {
   args: {
     ...Default.args,
-    maxLength: 20,
+    helperText: "Entrez votre nom et prénom",
+    counterLimit: 20,
+    counterHelperText: "Vous pouvez saisir jusqu’à 20 caractères",
+    counterTextUnderLimit: "caractères restants",
+    counterTextOverLimit: "caractères en trop",
     showCounter: true
   },
-  // name: 'With Counter',
+  name: 'Character Counter',
 };

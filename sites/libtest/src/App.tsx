@@ -12,12 +12,9 @@ function App() {
 
   return (
     <div>
-      <TextInput label="Internally controlled input" showCounter maxLength={64} counterText="caractères" />
+      <TextInput label="With counter" showCounter counterLimit={10} counterHelperText="Vous pouvez saisir jusqu’à 10 caractères" counterTextUnderLimit="caractères restants" counterTextOverLimit="caractères en trop" />
 
-      <TextInput label="Internally controlled input with default value" defaultValue="test" showCounter maxLength={64} counterText="caractères" />
-
-      <TextInput label="Controlled input" value={value} onChange={handleChange} showCounter maxLength={64} counterText="caractères" />
-      <p>The value of the controlled input is: {value}</p>
+      <TextInput label="Without counter" />
     </div>
   )
 }

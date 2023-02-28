@@ -1,9 +1,10 @@
+import { CharacterCounter, CharacterCounterProps } from "@components/CharacterCounter/CharacterCounter";
+import { GenericInputProps } from "@components/GenericInputProps";
 import classnames from "classnames";
-import React, { useId, useState } from "react";
-import { GenericInputProps } from "../GenericInputProps";
+import React, { useEffect, useId, useState } from "react";
 import styles from './TextInput.module.css';
 
-export interface TextInputProps extends GenericInputProps {
+export interface TextInputStaticProps extends GenericInputProps {
   /**
    * The type of `<input />`.
    */
@@ -18,28 +19,49 @@ export interface TextInputProps extends GenericInputProps {
    */
   hideLabel?: boolean,
   /**
-   * The maximum length of the value.
-   * This prop is required for the character counter.
+   * The absolute maximum length of the input value. If this prop is set, the user won't be able to type after reaching maxLength.
    */
   maxLength?: number,
-  /**
-   * if `true`, and if `maxLength` has been defined, displays the character counter.
-   */
-  showCounter?: boolean,
-  /**
-   * Optional text for the character counter.
-   */
-  counterText?: string,
-  /**
-   * Determines if the counter displays the length of the current value, or the remaining characters.
-   */
-  counterVariant?: "current" | "remaining",
 }
 
+type TextInputCounterProps =
+  | {
+    /**
+     * if `true`, and if `counterLimit` has been defined, displays the character counter.
+     */
+    showCounter: true;
+    /**
+     * The maximum length of the value as required for validation.
+     * This prop is required for the character counter and will allow typing after reaching counterLimit.
+     */
+    counterLimit: CharacterCounterProps["counterLimit"];
+    /**
+     * Gives an indication of the caracter limit to screen reader users. For example: "You can enter up to 20 characters"
+     */
+    counterHelperText: CharacterCounterProps["counterHelperText"];
+    /**
+     * Text for the character counter when value length is under `counterLimit`.
+     */
+    counterTextUnderLimit: CharacterCounterProps["counterTextUnderLimit"];
+    /**
+     * Text for the character counter when value length is over `counterLimit`.
+     */
+    counterTextOverLimit: CharacterCounterProps["counterTextOverLimit"];
+  }
+  | {
+    showCounter?: never | false;
+    counterLimit?: never;
+    counterHelperText?: never
+    counterTextUnderLimit?: never;
+    counterTextOverLimit?: never;
+  };
+
+export type TextInputProps = TextInputStaticProps & TextInputCounterProps;
+
+// Generate a unique id if none has been explicitely set, by using react's useId
 interface GenerateUniqueId {
   (id?: string): string;
 }
-// Generate a generic id if none has been explicitely set, by using react's useId
 const generateUniqueId: GenerateUniqueId = (id) => {
   if (id === undefined) {
     id = `${useId()}input`;
@@ -47,18 +69,18 @@ const generateUniqueId: GenerateUniqueId = (id) => {
   return id;
 }
 
+// Generate the ids string for aria-describedby, based on the component props
 interface GenerateAriaDescribedBy {
   (
     id: string,
     helperText: TextInputProps["helperText"],
     errorMessage: TextInputProps["errorMessage"],
     invalid: TextInputProps["invalid"],
-    maxLength: TextInputProps["maxLength"],
+    counterLimit: TextInputProps["counterLimit"],
     showCounter: TextInputProps["showCounter"]
   ): string | undefined
 }
-// Generate the ids string for aria-describedby, based on the component props
-const generateAriaDescribedBy: GenerateAriaDescribedBy = (id, helperText, errorMessage, invalid, maxLength, showCounter) => {
+const generateAriaDescribedBy: GenerateAriaDescribedBy = (id, helperText, errorMessage, invalid, counterLimit, showCounter) => {
   let ariaDescribedByIds: string[] = [];
   let ariaDescribedBy: string | undefined;
 
@@ -68,34 +90,13 @@ const generateAriaDescribedBy: GenerateAriaDescribedBy = (id, helperText, errorM
   if (!invalid && Boolean(helperText)) {
     ariaDescribedByIds.push(`${id}-helper`);
   }
-  if (maxLength && Boolean(showCounter)) {
-    ariaDescribedByIds.push(`${id}-counter`);
+  if (counterLimit && Boolean(showCounter)) {
+    ariaDescribedByIds.push(`${id}-counter-helper`);
   }
   if (ariaDescribedByIds.length > 0) {
     ariaDescribedBy = ariaDescribedByIds.join(" ");
   }
   return ariaDescribedBy;
-}
-interface GenerateCounterText {
-  (
-    counterVariant: TextInputProps["counterVariant"],
-    maxLength: TextInputProps["maxLength"],
-    counterText: TextInputProps["counterText"],
-    value: TextInputProps["value"]
-  ): string
-}
-// Calculate the value displayed in the counter
-const generateCounter: GenerateCounterText = (counterVariant, maxLength, counterText, value) => {
-  let counterValue: number = 0;
-
-  if (maxLength !== undefined && value !== undefined) {
-    if (counterVariant === "current") {
-      counterValue = value.toString().length;
-    } else if (counterVariant === "remaining") {
-      counterValue = maxLength - value.toString().length;
-    }
-  }
-  return `${counterValue} / ${maxLength} ${counterText}`;
 }
 
 // TextInput component
@@ -107,10 +108,11 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
   label,
   hideLabel,
   helperText,
-  maxLength,
-  counterText = "",
-  counterVariant = "current",
-  showCounter,
+  counterLimit,
+  counterHelperText,
+  counterTextUnderLimit = "characters remaining",
+  counterTextOverLimit = "characters over limit",
+  showCounter = false,
   errorMessage,
   required = false,
   requiredText = "*",
@@ -141,6 +143,10 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
   // props or from its internal state.
   const value = isControlled ? valueFromProps : internalValue;
 
+  const [delayedInternalValue, setDelayedInternalValue] = useState(
+    hasDefaultValue ? defaultValue : ""
+  );
+
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // When the user types, we will call props.onChange if it exists.
     // We do this even if there is no props.value (and the component
@@ -156,6 +162,15 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
     }
   };
 
+  // For screen readers, update the value after a delay when user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDelayedInternalValue(internalValue)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [internalValue])
+
   const classNames = classnames("mylib--form-item mylib--textinput", className)
 
   return (
@@ -165,6 +180,13 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
         <label className={`mylib--textinput__label ${styles.label}`} htmlFor={uniqueId}>
           {label}{required && <span className="mylib--textinput__required-text">{Boolean(requiredText) ? requiredText : "*"}</span>}
         </label>
+      )}
+
+      {/* Helper text */}
+      {Boolean(helperText) && invalid === false && (
+        <div id={`${uniqueId}-helper`} className="mylib--textinput__message mylib--textinput__helper">
+          {helperText}
+        </div>
       )}
 
       {/* Input */}
@@ -179,8 +201,7 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
         inputMode={inputMode}
         aria-label={hideLabel ? label : undefined}
         title={hideLabel ? label : undefined}
-        aria-describedby={generateAriaDescribedBy(uniqueId, helperText, errorMessage, invalid, maxLength, showCounter)}
-        maxLength={maxLength}
+        aria-describedby={generateAriaDescribedBy(uniqueId, helperText, errorMessage, invalid, counterLimit, showCounter)}
         required={required}
         aria-required={required || undefined}
         aria-invalid={invalid || undefined}
@@ -188,25 +209,26 @@ export const TextInput: React.FC<TextInputProps> = React.forwardRef(({
         ref={ref}
       />
 
-      {/* Helper text */}
-      {Boolean(helperText) && !invalid && (
-        <div id={`${uniqueId}-helper`} className="mylib--textinput__message mylib--textinput__helper">
-          {helperText}
-        </div>
-      )}
-
       {/* Error text */}
-      {Boolean(errorMessage) && invalid && (
+      {Boolean(errorMessage) && invalid === true && (
         <div id={`${uniqueId}-error`} className="mylib--textinput__message mylib--textinput__error-message">
           {errorMessage}
         </div>
       )}
 
       {/* Character counter */}
-      {Boolean(maxLength) && showCounter && (
-        <div id={`${uniqueId}-counter`} className="mylib--textinput__counter">
-          {generateCounter(counterVariant, maxLength, counterText, value)}
-        </div>
+      {showCounter === true && counterHelperText && (
+        <>
+          <CharacterCounter
+            counterHelperTextId={`${uniqueId}-counter-helper`}
+            counterHelperText={counterHelperText}
+            counterLimit={counterLimit}
+            counterTextUnderLimit={counterTextUnderLimit}
+            counterTextOverLimit={counterTextOverLimit}
+            value={internalValue}
+            delayedValue={delayedInternalValue}
+          />
+        </>
       )}
     </div>
   );
